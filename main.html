@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoRoute - Smart Waste Collection with MST Optimization</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="inter-page-nav">
+  <a href="login.html" id="to-login">Login</a> |
+  <a href="signup.html" id="to-signup">Sign Up</a>
+</nav>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-recycle"></i>
+                <span>EcoRoute</span>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <ul class="nav-menu" id="navMenu">
+                <!-- Always visible links -->
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#benefits">Benefits</a></li>
+                <li><a href="#government">Regulations</a></li>
+                <li><a href="#contact">Contact</a></li>
+                
+                <!-- Show when NOT logged in -->
+                <li class="auth-links" id="authLinks">
+                    <a href="signup.html" class="signup-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Sign Up Free
+                    </a>
+                </li>
+                <li class="auth-links">
+                    <a href="login.html" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </a>
+                </li>
+                
+                <!-- Show when logged in -->
+                <li class="user-menu" id="userMenu" style="display: none;">
+                    <div class="user-dropdown">
+                        <button class="user-button" onclick="toggleUserDropdown()">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="userDisplayName">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content" id="userDropdown">
+                            <a href="welcome.html">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Start Here
+                            </a>
+                            <a href="house-details.html">
+                                <i class="fas fa-home"></i>
+                                Register House
+                            </a>
+                            <a href="index.html">
+                                <i class="fas fa-route"></i>
+                                Route Optimization
+                            </a>
+                            <a href="subscribe.html" id="upgradeLink">
+                                <i class="fas fa-crown"></i>
+                                Upgrade to Premium
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="feedback.html">
+                                <i class="fas fa-comment"></i>
+                                Feedback
+                            </a>
+                            <a href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+            <!-- Mobile hamburger menu -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Smart Waste Collection with MST-Based Route Optimization</h1>
+                    <p class="hero-description">
+                        Revolutionary waste management system using Minimum Spanning Tree algorithms to optimize collection routes, reduce costs by 40%, and protect the environment from harmful waste disposal.
+                    </p>
+                    
+                    <!-- Hero Statistics -->
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">40%</div>
+                            <div class="stat-label">Fuel Savings</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">35%</div>
+                            <div class="stat-label">Route Efficiency</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">60%</div>
+                            <div class="stat-label">Time Reduction</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">95%</div>
+                            <div class="stat-label">User Satisfaction</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hero Buttons - Dynamic based on login status -->
+                    <div class="hero-buttons" id="heroButtons">
+                        <!-- Show when NOT logged in -->
+                        <div class="guest-buttons" id="guestButtons">
+                            <a href="signup.html" class="btn btn-primary btn-large">
+                                <i class="fas fa-rocket"></i>
+                                Start Free Account
+                            </a>
+                           
+                        </div>
+                        
+                        <!-- Show when logged in -->
+                        <div class="user-buttons" id="userButtons" style="display: none;">
+                            <a href="dashboard.html" class="btn btn-primary btn-large">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Go to Dashboard
+                            </a>
+                            <a href="house-details.html" class="btn btn-secondary btn-large">
+                                <i class="fas fa-home"></i>
+                                Register House
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- User Status Display -->
+                    <div class="user-status" id="userStatus" style="display: none;">
+                        <div class="status-card">
+                            <div class="status-info">
+                                <span class="status-label">Account Status:</span>
+                                <span class="status-badge" id="accountTypeBadge">Free Plan</span>
+                            </div>
+                            <div class="status-info">
+                                <span class="status-label">Houses Registered:</span>
+                                <span class="status-value" id="housesCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Hero Visualization -->
+                <div class="hero-visual">
+                    <div class="route-demo-container">
+                        <div class="demo-header">
+                            <h3>Live MST Route Optimization</h3>
+                        
+            
+                        </div>
+                        
+                        <div class="demo-map" id="demoMap">
+                            <!-- Starting Depot -->
+                            <div class="starting-point depot-point" title="Starting Point: Depot - Pincode 283135">
+                                <div class="point-pulse"></div>
+                                <i class="fas fa-warehouse"></i>
+                                <span class="point-label">Depot</span>
+                                <div class="point-info">283135</div>
+                            </div>
+                            
+                            <!-- Collection Points with MST connections -->
+                            <div class="route-points">
+                                <div class="route-point house-point point-1" data-house="1" style="top: 25%; left: 35%;" title="House 1 - Owner: Rajesh Kumar">
+                                    <div class="point-pulse"></div>
+                                    <i class="fas fa-home"></i>
+                                    <span class="point-number">1</span>
+                                    <div class="house-info">
+                                        <div class="owner-name">Anshika</div>
+                                        <div class="waste-type">Organic</div>
+                                    </div>
+                                </div>
+                                <div class="route-point house-point point-2" data-house="2" style="top: 45%; left: 65%;" title="House 2 - Owner: Priya Sharma">
+                                    <div class="point-pulse"></div>
+                                    <i class="fas fa-home"></i>
+                                    <span class="point-number">2</span>
+                                    <div class="house-info">
+                                        <div class="owner-name">Jhanvi</div>
+                                        <div class="waste-type">Recyclable</div>
+                                    </div>
+                                </div>
+                                <div class="route-point house-point point-3" data-house="3" style="top: 65%; left: 30%;" title="House 3 - Owner: Amit Singh">
+                                    <div class="point-pulse"></div>
+                                    <i class="fas fa-home"></i>
+                                    <span class="point-number">3</span>
+                                    <div class="house-info">
+                                        <div class="owner-name">Aarush</div>
+                                        <div class="waste-type">Mixed</div>
+                                    </div>
+                                </div>
+                                <div class="route-point house-point point-4" data-house="4" style="top: 80%; left: 70%;" title="House 4 - Owner: Sunita Devi">
+                                    <div class="point-pulse"></div>
+                                    <i class="fas fa-home"></i>
+                                    <span class="point-number">4</span>
+                                    <div class="house-info">
+                                        <div class="owner-name">Neha</div>
+                                        <div class="waste-type">Household</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Enhanced MST Route Lines with Animation -->
+                            <svg class="route-lines" viewBox="0 0 100 100">
+                                <!-- MST Edges with proper shortest path -->
+                                <line x1="50" y1="15" x2="35" y2="25" stroke="#00d4aa" stroke-width="0.8" class="route-line line-1" stroke-dasharray="2,2"/>
+                                <line x1="35" y1="25" x2="30" y2="65" stroke="#00d4aa" stroke-width="0.8" class="route-line line-2" stroke-dasharray="2,2"/>
+                                <line x1="30" y1="65" x2="65" y2="45" stroke="#00d4aa" stroke-width="0.8" class="route-line line-3" stroke-dasharray="2,2"/>
+                                <line x1="65" y1="45" x2="70" y2="80" stroke="#00d4aa" stroke-width="0.8" class="route-line line-4" stroke-dasharray="2,2"/>
+                                
+                                <!-- Distance Labels -->
+                                <text x="42" y="18" fill="#00d4aa" font-size="2" font-weight="bold">2.1km</text>
+                                <text x="28" y="45" fill="#00d4aa" font-size="2" font-weight="bold">1.8km</text>
+                                <text x="47" y="58" fill="#00d4aa" font-size="2" font-weight="bold">2.3km</text>
+                                <text x="70" y="65" fill="#00d4aa" font-size="2" font-weight="bold">1.9km</text>
+                            </svg>
+                            
+                            <!-- Animated Collection Vehicle -->
+                            <div class="collection-vehicle" id="collectionVehicle">
+                                <i class="fas fa-truck"></i>
+                                <div class="vehicle-trail"></div>
+                            </div>
+                            
+                            <!-- Route Progress Indicator -->
+                            <div class="route-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="routeProgressFill"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span id="currentStop">Starting from Depot</span>
+                                    <span id="progressPercent">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Enhanced Demo Stats -->
+                        <div class="demo-stats">
+                            <div class="demo-stat">
+                                <div class="stat-icon">
+                                    <i class="fas fa-route"></i>
+                                </div>
+                                <span class="stat-value" id="totalDistance">8.1km</span>
+                                <span class="stat-desc">Total Distance</span>
+                                <div class="stat-comparison">
+                                    <span class="old-value">vs 12.4km</span>
+                                    <span class="savings">35% saved</span>
+                                </div>
+                            </div>
+                            <div class="demo-stat">
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <span class="stat-value" id="totalTime">28min</span>
+                                <span class="stat-desc">Collection Time</span>
+                                <div class="stat-comparison">
+                                    <span class="old-value">vs 45min</span>
+                                    <span class="savings">38% saved</span>
+                                </div>
+                            </div>
+                            <div class="demo-stat">
+                                <div class="stat-icon">
+                                    <i class="fas fa-gas-pump"></i>
+                                </div>
+                                <span class="stat-value" id="fuelSaved">3.2L</span>
+                                <span class="stat-desc">Fuel Saved</span>
+                                <div class="stat-comparison">
+                                    <span class="old-value">₹280 saved</span>
+                                    <span class="savings">40% less</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>Advanced Waste Collection Services</h2>
+                <p>Comprehensive solutions powered by cutting-edge MST optimization algorithms</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card featured">
+                    <div class="service-header">
+                        <div class="service-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div class="service-badge">Core Feature</div>
+                    </div>
+                    <h3>MST Route Optimization</h3>
+                    <p>Minimum Spanning Tree algorithm finds the most efficient collection routes, starting from pincode 283135 depot with real-time optimization.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Kruskal's Algorithm Implementation</li>
+                        <li><i class="fas fa-check"></i> Real-time Route Calculation</li>
+                        <li><i class="fas fa-check"></i> GPS-based Distance Matrix</li>
+                        <li><i class="fas fa-check"></i> Dynamic Route Updates</li>
+                        <li><i class="fas fa-check"></i> O(E log E) Time Complexity</li>
+                    </ul>
+                    <div class="service-action">
+                        <a href="index.html" class="btn btn-primary">Try Optimization</a>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                    </div>
+                    <h3>Smart House Registration</h3>
+                    <p>Easy registration system for households with automatic map integration, owner tracking, and waste classification.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Owner Information Display</li>
+                        <li><i class="fas fa-check"></i> GPS Location Auto-mapping</li>
+                        <li><i class="fas fa-check"></i> Waste Type Classification</li>
+                        <li><i class="fas fa-check"></i> Collection Scheduling</li>
+                        <li><i class="fas fa-check"></i> Contact Management</li>
+                    </ul>
+                    <div class="service-action">
+                        <a href="house-details.html" class="btn btn-outline">Register House</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon">
+                            <i class="fas fa-truck-moving"></i>
+                        </div>
+                    </div>
+                    <h3>Real-time Tracking</h3>
+                    <p>Live tracking of waste collection vehicles with route progress, ETA updates, and customer notifications.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> GPS Vehicle Tracking</li>
+                        <li><i class="fas fa-check"></i> Route Progress Monitor</li>
+                        <li><i class="fas fa-check"></i> Customer Notifications</li>
+                        <li><i class="fas fa-check"></i> Vendor Dashboard</li>
+                        <li><i class="fas fa-check"></i> Live ETA Updates</li>
+                    </ul>
+                    <div class="service-action">
+                        <a href="vendor-dashboard.html" class="btn btn-outline">View Tracking</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <h3>Analytics & Reporting</h3>
+                    <p>Comprehensive analytics on route efficiency, environmental impact, cost savings, and performance metrics.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Route Efficiency Metrics</li>
+                        <li><i class="fas fa-check"></i> CO2 Emission Tracking</li>
+                        <li><i class="fas fa-check"></i> Fuel Consumption Analysis</li>
+                        <li><i class="fas fa-check"></i> Cost Optimization Reports</li>
+                        <li><i class="fas fa-check"></i> Performance Dashboards</li>
+                    </ul>
+                    <div class="service-action">
+                        <a href="dashboard.html" class="btn btn-outline">View Analytics</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="benefits">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Smart Waste Collection Matters</h2>
+                <p>Environmental protection through intelligent waste management and route optimization</p>
+            </div>
+            
+            <div class="benefits-content">
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="benefit-content">
+                            <h3>Environmental Protection</h3>
+                            <p>Proper waste collection prevents environmental contamination. Animals eating waste from open areas can die from plastic consumption, leading to ecosystem damage and biodiversity loss.</p>
+                            <div class="benefit-metrics">
+                                <div class="metric">
+                                    <span class="metric-value">2.5kg</span>
+                                    <span class="metric-label">CO2 saved per route</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-value">95%</span>
+                                    <span class="metric-label">Pollution reduction</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="benefit-content">
+                            <h3>Cost Efficiency</h3>
+                            <p>MST algorithm reduces collection routes by 35%, saving fuel costs and operational expenses significantly while improving service quality.</p>
+                            <div class="benefit-metrics">
+                                <div class="metric">
+                                    <span class="metric-value">₹15,000</span>
+                                    <span class="metric-label">Monthly savings</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-value">35%</span>
+                                    <span class="metric-label">Route reduction</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="benefit-content">
+                            <h3>Time Optimization</h3>
+                            <p>Automated route planning and real-time optimization saves valuable time for vendors and improves customer satisfaction.</p>
+                            <div class="benefit-metrics">
+                                <div class="metric">
+                                    <span class="metric-value">60%</span>
+                                    <span class="metric-label">Time reduction</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-value">4hrs</span>
+                                    <span class="metric-label">Daily time saved</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="benefit-content">
+                            <h3>Health & Safety</h3>
+                            <p>Systematic waste collection prevents disease spread, maintains public health standards, and creates cleaner communities.</p>
+                            <div class="benefit-metrics">
+                                <div class="metric">
+                                    <span class="metric-value">90%</span>
+                                    <span class="metric-label">Health hazard reduction</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-value">100%</span>
+                                    <span class="metric-label">Coverage reliability</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Environmental Impact Dashboard -->
+                <div class="environmental-dashboard">
+                    <h3>Real-time Environmental Impact</h3>
+                    <div class="impact-grid">
+                        <div class="impact-card">
+                            <div class="impact-icon">
+                                <i class="fas fa-tree"></i>
+                            </div>
+                            <div class="impact-data">
+                                <span class="impact-value" id="treesSaved">247</span>
+                                <span class="impact-label">Trees Equivalent Saved</span>
+                            </div>
+                        </div>
+                        <div class="impact-card">
+                            <div class="impact-icon">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="impact-data">
+                                <span class="impact-value" id="waterConserved">1,250L</span>
+                                <span class="impact-label">Water Conserved</span>
+                            </div>
+                        </div>
+                        <div class="impact-card">
+                            <div class="impact-icon">
+                                <i class="fas fa-gas-pump"></i>
+                            </div>
+                            <div class="impact-data">
+                                <span class="impact-value" id="fuelSaved">340L</span>
+                                <span class="impact-label">Fuel Saved</span>
+                            </div>
+                        </div>
+                        <div class="impact-card">
+                            <div class="impact-icon">
+                                <i class="fas fa-globe-americas"></i>
+                            </div>
+                            <div class="impact-data">
+                                <span class="impact-value" id="co2Reduced">890kg</span>
+                                <span class="impact-label">CO2 Emissions Reduced</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Government Regulations -->
+    <section id="government" class="regulations">
+        <div class="container">
+            <div class="section-header">
+                <h2>Government Regulations & Environmental Laws</h2>
+                <p>Understanding the legal consequences of improper waste disposal and the importance of systematic collection</p>
+            </div>
+            
+            <div class="regulations-warning">
+                <div class="warning-content">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="warning-text">
+                        <h3>Critical Environmental Alert</h3>
+                        <p>Every year, thousands of animals die from consuming plastic waste thrown in open areas. Marine life, street animals, and wildlife suffer from plastic ingestion, leading to painful deaths and ecosystem collapse. <strong>Your responsible waste disposal can save lives.</strong></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="regulations-grid">
+                <div class="regulation-card severe">
+                    <div class="regulation-header">
+                        <div class="regulation-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="severity-badge severe">High Risk</div>
+                    </div>
+                    <h3>Open Area Dumping</h3>
+                    <div class="fine-amount">₹5,000 - ₹25,000</div>
+                    <p>Throwing waste in open areas, streets, or public spaces is strictly prohibited under environmental protection laws.</p>
+                    <div class="regulation-details">
+                        <ul>
+                            <li>First offense: ₹5,000 fine + warning</li>
+                            <li>Repeat offense: ₹25,000 fine</li>
+                            <li>Community service: 40 hours mandatory</li>
+                            <li>Environmental restoration fee</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="regulation-card critical">
+                    <div class="regulation-header">
+                        <div class="regulation-icon">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="severity-badge critical">Critical</div>
+                    </div>
+                    <h3>Plastic Waste Violation</h3>
+                    <div class="fine-amount">₹10,000 - ₹50,000</div>
+                    <p>Improper disposal of plastic waste and single-use plastics causing environmental damage.</p>
+                    <div class="regulation-details">
+                        <ul>
+                            <li>Plastic burning: ₹50,000 fine</li>
+                            <li>River/water body dumping: ₹25,000</li>
+                            <li>Business license suspension possible</li>
+                            <li>Mandatory plastic waste management training</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="regulation-card extreme">
+                    <div class="regulation-header">
+                        <div class="regulation-icon">
+                            <i class="fas fa-industry"></i>
+                        </div>
+                        <div class="severity-badge extreme">Extreme</div>
+                    </div>
+                    <h3>Industrial Waste</h3>
+                    <div class="fine-amount">₹1,00,000+</div>
+                    <p>Unauthorized disposal of industrial and hazardous waste materials.</p>
+                    <div class="regulation-details">
+                        <ul>
+                            <li>Hazardous waste: ₹5,00,000 fine</li>
+                            <li>Water contamination: ₹10,00,000+</li>
+                            <li>Criminal prosecution possible</li>
+                            <li>Business closure orders</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="regulation-card warning">
+                    <div class="regulation-header">
+                        <div class="regulation-icon">
+                            <i class="fas fa-paw"></i>
+                        </div>
+                        <div class="severity-badge warning">Animal Welfare</div>
+                    </div>
+                    <h3>Animal Welfare Violation</h3>
+                    <div class="fine-amount">₹15,000 - ₹75,000</div>
+                    <p>Waste disposal causing harm to animals and wildlife, including death from plastic consumption.</p>
+                    <div class="regulation-details">
+                        <ul>
+                            <li>Animal death due to waste: ₹75,000</li>
+                            <li>Habitat destruction: ₹50,000</li>
+                            <li>Wildlife protection act violation</li>
+                            <li>Ecosystem damage compensation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Call to Action -->
+    <section id="contact" class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Optimize Your Waste Collection?</h2>
+                <p>Join thousands of satisfied users who have revolutionized their waste management with our MST-based optimization system</p>
+                
+                <!-- Dynamic CTA based on login status -->
+                <div class="cta-buttons" id="ctaButtons">
+                    <!-- Show when NOT logged in -->
+                    <div class="guest-cta" id="guestCta">
+                        <a href="signup.html" class="btn btn-primary btn-large">
+                            <i class="fas fa-rocket"></i>
+                            Start Free Account
+                        </a>
+                     
+                    </div>
+                    
+                
+                    </div>
+                </div>
+                
+                <div class="cta-features">
+                    <div class="feature-item">
+                        <i class="fas fa-check"></i>
+                        <span>Free Registration</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check"></i>
+                        <span>No Credit Card Required</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check"></i>
+                        <span>Instant Setup</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check"></i>
+                        <span>MST Optimization</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-recycle"></i>
+                        <span>EcoRoute</span>
+                    </div>
+                    <p>Smart waste collection for a cleaner, sustainable tomorrow using advanced MST optimization algorithms starting from depot 283135.</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Access</h3>
+                    <ul>
+                        <li><a href="signup.html">Sign Up Free</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="route-optimization.html">Route Optimization</a></li>
+                        <li><a href="house-details.html">House Registration</a></li>
+                        <li><a href="vendor-dashboard.html">Vendor Portal</a></li>
+                        <li><a href="feedback.html">Feedback</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> support@ecoroute.com</p>
+                        <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Depot: Pincode 283135</p>
+                        <p><i class="fas fa-clock"></i> 24/7 Support Available</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2024 EcoRoute. All rights reserved. | Smart Waste Collection with MST Optimization</p>
+                    <div class="footer-links">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script1.js"></script>
+<script src="nav.js"></script>
+</body>
+</html>

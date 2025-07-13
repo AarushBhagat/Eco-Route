@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+// Only run if not already on welcome page:
+if (!sessionStorage.getItem('welcome_shown')) {
+    window.location.href = "welcome.html";
+}
+</script>
+    <meta charset="UTF-8">
+    <title>Fuel Efficiency Calculator · SGB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Heroicons CDN for sidebar icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        body, h1, h2, h3, h4, h5, h6, input, select, button, label {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif !important;
+        }
+        .glass {
+            background: rgba(255,255,255,0.86);
+            box-shadow: 0 10px 36px 0 rgba(31, 38, 135, 0.14);
+            border-radius: 1.25rem;
+            border: 1.5px solid rgba(34, 197, 94, 0.10);
+            backdrop-filter: blur(8px);
+        }
+        .btn-main {
+            background: linear-gradient(90deg,#16a34a 30%,#22c55e 100%);
+            color: #fff;
+            font-weight: 700;
+            border-radius: 1.5rem;
+            padding: 0.8em 2.2em;
+            transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+            box-shadow: 0 4px 32px rgba(22, 163, 74, 0.09);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-main:after {
+            content: "";
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 100%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+            z-index: 1;
+        }
+        .btn-main:active:after {
+            width: 200%;
+            height: 500%;
+        }
+        .btn-main:hover {
+            background: linear-gradient(90deg,#22c55e 10%,#16a34a 90%);
+            transform: translateY(-2px) scale(1.035);
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.14);
+        }
+        .sidebar {
+            background: linear-gradient(135deg,#1a5c1a 60%,#2e8b57 100%);
+            color: #f9fafb;
+            min-width: 250px;
+            max-width: 260px;
+            transition: all 0.3s;
+            box-shadow: 2px 0 24px rgba(22, 101, 52, 0.09);
+        }
+        .sidebar .icon {
+            stroke: #d1fae5;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1.3rem;
+            margin: 0.15rem 0;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background 0.15s, color 0.18s;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: rgba(34, 197, 94, 0.18);
+            color: #86efac;
+        }
+        .animate-fadein {
+            animation: fadein 0.85s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes fadein {
+            0% { opacity: 0; transform: translateY(30px);}
+            100% { opacity: 1; transform: none;}
+        }
+        .animate-slidein {
+            animation: slidein 0.9s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes slidein {
+            0% { opacity: 0; transform: translateX(-70px);}
+            100% { opacity: 1; transform: none;}
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #86efac;
+            border-radius: 8px;
+        }
+        :root {
+          --main-bg: #f0fdf4;
+          --sidebar-bg: linear-gradient(135deg,#1a5c1a 60%,#2e8b57 100%);
+          --glass-bg: rgba(255,255,255,0.86);
+          --text-main: #14532d;
+          --header-bg: linear-gradient(to right, #1a5c1a, #2e8b57);
+        }
+
+        body.dark {
+          --main-bg: #0c1a12;
+          --sidebar-bg: linear-gradient(135deg,#0d2818 80%,#1b3a2b 100%);
+          --glass-bg: rgba(26,92,26,0.92);
+          --text-main: #d1fae5;
+          --header-bg: linear-gradient(to right, #0d2818, #1b3a2b);
+          color-scheme: dark;
+        }
+
+        body {
+          background: var(--main-bg);
+        }
+        .sidebar {
+          background: var(--sidebar-bg);
+        }
+        header, footer {
+          background: var(--header-bg);
+        }
+
+        .glass {
+          background: var(--glass-bg) !important;
+          color: var(--text-main);
+        }
+        h1, h2, h3, h4, h5, h6, label, .setting-label, .sidebar-link {
+          color: var(--text-main) !important;
+        }
+        .sidebar-link.active, .sidebar-link:hover {
+          color: #86efac !important;
+        }
+        .sidebar, .sidebar-link {
+          color: var(--text-main) !important;
+        }
+        input, select, textarea {
+          background: #fff;
+          color: #14532d;
+        }
+        body.dark input, body.dark select, body.dark textarea {
+          background: #1a5c1a;
+          color: #d1fae5;
+          border-color: #166534;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 via-emerald-100 to-teal-100 min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="sidebar flex flex-col py-7 px-3 space-y-6 animate-slidein">
+        <div class="text-3xl font-extrabold text-emerald-200 tracking-wide mb-4">EcoRoute</div>
+        <nav class="flex-1 flex flex-col gap-2">
+    <a href="index.html" class="sidebar-link"><i data-feather="map" class="icon"></i> Map & Routing</a>
+    <a href="statistics.html" class="sidebar-link"><i data-feather="bar-chart-2" class="icon"></i> Statistics</a>
+    <a href="fuel.html" class="sidebar-link"><i data-feather="droplet" class="icon"></i> Fuel Calculator</a>
+    <a href="settings.html" class="sidebar-link"><i data-feather="settings" class="icon"></i> Settings</a>
+</nav>
+        <div class="mt-auto flex flex-col gap-2 text-xs text-green-200">
+            <span>Smart Waste Routing</span>
+            <span>© 2025 MST Optimization</span>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        
+        <header class="bg-gradient-to-r from-green-900 to-emerald-800 text-white py-7 px-6 shadow-xl animate-fadein">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-center tracking-tight mb-2">Fuel Efficiency Calculator</h1>
+            <p class="text-center text-lg sm:text-xl font-medium italic text-emerald-200">Plan smart, drive smart, save more.</p>
+        </header>
+        
+        <main class="flex-1 container mx-auto px-3 sm:px-8 py-8 flex flex-col gap-8 animate-fadein">
+            <!-- Why Efficiency Matters -->
+            <section class="glass p-7 shadow-lg transition-all mb-2">
+                <h2 class="text-2xl font-bold text-green-800 mb-3">Why Fuel Efficiency Matters</h2>
+                <p class="text-green-700 text-lg">
+                    Optimizing fuel usage is crucial for sustainable waste collection. Efficient routes and smart vehicle choices mean lower costs, reduced emissions, and a healthier environment. Use this calculator to estimate your fuel needs and costs for each route, and discover how small changes can make a big impact!
+                </p>
+            </section>
+            <!-- Route Info Section -->
+            <section class="glass p-7 shadow-lg transition-all mb-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-green-800 mb-2 flex items-center gap-2">
+                        <i data-feather="info" class="icon"></i> Route Summary
+                    </h2>
+                    <p class="text-green-700 text-lg">
+                        These are the latest optimized routing details. Double-check the numbers with your last calculation from the main page!
+                    </p>
+                </div>
+                <div class="flex flex-col gap-2 min-w-[200px]">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-green-700 text-lg">Collection Points:</span>
+                        <span id="fuelPoints" class="font-mono text-xl text-green-900">0</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-green-700 text-lg">Total Route Length:</span>
+                        <span id="fuelLength" class="font-mono text-xl text-green-900">0 km</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Fuel Calculator Section -->
+            <section class="glass p-7 shadow-lg transition-all flex flex-col gap-5">
+                <h2 class="text-2xl text-green-900 font-semibold mb-2 italic">Fuel Efficiency Calculator</h2>
+                <form id="fuelForm" class="space-y-5">
+                    <div>
+                        <label for="vehicleType" class="block mb-1 font-medium text-green-700">Vehicle Type</label>
+                        <select id="vehicleType" name="vehicleType" required
+                            class="w-full rounded-xl border-2 border-green-200 px-4 py-2 text-lg focus:border-green-500">
+                            <option value="">Choose Type</option>
+                            <option value="diesel">Diesel</option>
+                            <option value="petrol">Petrol</option>
+                        </select>
+                    </div>
+                    <div id="mileageSection" style="display:none;">
+                        <label for="mileage" class="block mb-1 font-medium text-green-700">Mileage (km/litre)</label>
+                        <input type="number" id="mileage" name="mileage" min="1" step="0.1" required
+                            class="w-full rounded-xl border-2 border-green-200 px-4 py-2 text-lg focus:border-green-500"
+                            placeholder="e.g. 12.5">
+                    </div>
+                    <div>
+                        <label class="block mb-1 font-medium text-green-700">Route Length (km)</label>
+                        <input type="number" id="routeLength" min="0.1" step="0.01"
+                            class="w-full font-mono rounded-xl bg-green-50 border-2 border-green-100 px-4 py-2 text-lg text-green-900"
+                            placeholder="Enter route length">
+                        <div class="text-xs mt-1 text-green-700">Auto-filled if available, otherwise copy from "Total Route Length" above.</div>
+                    </div>
+                    <button type="button" onclick="calculateFuel()" class="btn-main w-full text-lg mt-2">Calculate</button>
+                </form>
+                <div id="fuelResult" class="mt-5"></div>
+                <div class="text-xs mt-3 text-green-700">Current rates: <b>Diesel ₹87.38/l</b>, <b>Petrol ₹96/l</b></div>
+            </section>
+        </main>
+        <footer class="bg-gradient-to-r from-green-900 to-emerald-800 text-white py-4 text-center shadow-xl animate-fadein">
+            <span class="font-semibold tracking-wider text-lg" style="font-style:italic;">Smart Waste Collection</span>
+            <span class="mx-2">·</span>
+            <span class="text-sm italic">MST Optimization Demo · <span class="text-emerald-200">2025</span></span>
+        </footer>
+    </div>
+    <!-- Scripts -->
+    <script>
+        feather.replace();
+function applyRoutingOptions() {
+    // Get values, or set defaults
+    const vehicleType = localStorage.getItem('sgb_vehicle_type') || ''; // Default to diesel
+    const units = localStorage.getItem('sgb_units') || 'km';
+
+    // Set UI dropdowns if they exist (for editability)
+    if (document.getElementById('vehicleType')) {
+        document.getElementById('vehicleType').value = vehicleType;
+    }
+    if (document.getElementById('units')) {
+        document.getElementById('units').value = units;
+    }
+
+    // Use these in your calculations (for example in fuel calculation, distance display, etc.)
+    window.sgbVehicleType = vehicleType;
+    window.sgbUnits = units;
+}
+
+// Call this on DOMContentLoaded or at the top of your script
+document.addEventListener('DOMContentLoaded', applyRoutingOptions);
+        // Try to auto-fill from sessionStorage (if used from main page)
+        window.addEventListener('DOMContentLoaded', () => {
+            // Try to read from sessionStorage
+            const points = sessionStorage.getItem('sgb_points');
+            const length = sessionStorage.getItem('sgb_length');
+            if (points) document.getElementById('fuelPoints').innerText = points;
+            if (length) {
+                document.getElementById('fuelLength').innerText = length + ' km';
+                document.getElementById('routeLength').value = length;
+            }
+        });
+
+        // Show mileage input on vehicle type select
+        document.getElementById('vehicleType').addEventListener('change', function() {
+            document.getElementById('mileageSection').style.display = this.value ? 'block' : 'none';
+        });
+
+        // Fuel calculation
+        function calculateFuel() {
+            const vehicleType = document.getElementById('vehicleType').value;
+            const mileage = parseFloat(document.getElementById('mileage').value);
+            const routeLength = parseFloat(document.getElementById('routeLength').value);
+
+            if (!vehicleType || !mileage || !routeLength) {
+                document.getElementById('fuelResult').innerHTML =
+                    `<span class="text-red-600 font-semibold">Please complete all fields.</span>`;
+                return;
+            }
+            const rates = { diesel: 87.38, petrol: 96.00 };
+            const litres = routeLength / mileage;
+            const cost = litres * rates[vehicleType];
+            document.getElementById('fuelResult').innerHTML = `
+                <div class="mt-2 p-4 rounded-xl bg-green-50 border-2 border-green-100 animate-fadein">
+                    <span class="block text-lg font-semibold text-green-700 mb-1">Estimated Fuel Usage:</span>
+                    <span class="block text-green-700 mb-1">Required: <b>${litres.toFixed(2)} litres</b></span>
+                    <span class="block text-green-700">Estimated Cost: <b>₹${cost.toFixed(2)}</b></span>
+                </div>
+            `;
+        }
+        // Theme switching logic for all pages (no themeSelect on non-settings pages)
+function applyTheme(theme) {
+    if (theme === "dark") {
+        document.body.classList.add("dark");
+    } else if (theme === "light") {
+        document.body.classList.remove("dark");
+    } else {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            document.body.classList.add("dark");
+        } else {
+            document.body.classList.remove("dark");
+        }
+    }
+}
+window.addEventListener('DOMContentLoaded', function() {
+    const theme = localStorage.getItem('sgb_theme') || 'auto';
+    applyTheme(theme);
+});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+    if ((localStorage.getItem('sgb_theme') || 'auto') === 'auto') {
+        applyTheme('auto');
+    }
+});
+    </script>
+</body>
+</html>

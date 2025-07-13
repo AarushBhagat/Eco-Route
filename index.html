@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+// Only run if not already on welcome page:
+if (!sessionStorage.getItem('welcome_shown')) {
+    window.location.href = "welcome.html";
+}
+</script>
+    <meta charset="UTF-8">
+    <title>Smart Waste Collection Routing · MST Optimization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Heroicons CDN for sidebar icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        body, h1, h2, h3, h4, h5, h6, input, select, button, label {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif !important;
+        }
+        .glass {
+            background: rgba(255,255,255,0.86);
+            box-shadow: 0 10px 36px 0 rgba(31, 38, 135, 0.14);
+            border-radius: 1.25rem;
+            border: 1.5px solid rgba(34, 197, 94, 0.10);
+            backdrop-filter: blur(8px);
+        }
+        .btn-main {
+            background: linear-gradient(90deg,#16a34a 30%,#22c55e 100%);
+            color: #fff;
+            font-weight: 700;
+            border-radius: 1.5rem;
+            padding: 0.8em 2.2em;
+            transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+            box-shadow: 0 4px 32px rgba(22, 163, 74, 0.09);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-main:after {
+            content: "";
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 100%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+            z-index: 1;
+        }
+        
+        .btn-main:active:after {
+            width: 200%;
+            height: 500%;
+        }
+        .btn-main:hover {
+            background: linear-gradient(90deg,#22c55e 10%,#16a34a 90%);
+            transform: translateY(-2px) scale(1.035);
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.14);
+        }
+        .btn-secondary {
+            background: #fff;
+            color: #166534;
+            border: 2px solid #166534;
+            font-weight: 600;
+            border-radius: 1.5rem;
+            padding: 0.8em 2.2em;
+            transition: all 0.13s;
+        }
+        .btn-secondary:hover {
+            background: #dcfce7;
+            color: #14532d;
+            border-color: #14532d;
+        }
+        .sidebar {
+            background: linear-gradient(135deg,#1a5c1a 60%,#2e8b57 100%);
+            color: #f9fafb;
+            min-width: 250px;
+            max-width: 260px;
+            transition: all 0.3s;
+            box-shadow: 2px 0 24px rgba(22, 101, 52, 0.09);
+        }
+        .sidebar .icon {
+            stroke: #d1fae5;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1.3rem;
+            margin: 0.15rem 0;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background 0.15s, color 0.18s;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: rgba(34, 197, 94, 0.18);
+            color: #86efac;
+        }
+        .animate-fadein {
+            animation: fadein 0.85s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes fadein {
+            0% { opacity: 0; transform: translateY(30px);}
+            100% { opacity: 1; transform: none;}
+        }
+        .animate-slidein {
+            animation: slidein 0.9s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes slidein {
+            0% { opacity: 0; transform: translateX(-70px);}
+            100% { opacity: 1; transform: none;}
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #86efac;
+            border-radius: 8px;
+        }
+        :root {
+          --main-bg: #f0fdf4;
+          --sidebar-bg: linear-gradient(135deg,#1a5c1a 60%,#2e8b57 100%);
+          --glass-bg: rgba(255,255,255,0.86);
+          --text-main: #14532d;
+          --header-bg: linear-gradient(to right, #1a5c1a, #2e8b57);
+        }
+
+        body.dark {
+          --main-bg: #0c1a12;
+          --sidebar-bg: linear-gradient(135deg,#0d2818 80%,#1b3a2b 100%);
+          --glass-bg: rgba(26,92,26,0.92);
+          --text-main: #d1fae5;
+          --header-bg: linear-gradient(to right, #0d2818, #1b3a2b);
+          color-scheme: dark;
+        }
+
+        body {
+          background: var(--main-bg);
+        }
+        .sidebar {
+          background: var(--sidebar-bg);
+        }
+        header, footer {
+          background: var(--header-bg);
+        }
+
+        .glass {
+          background: var(--glass-bg) !important;
+          color: var(--text-main);
+        }
+        h1, h2, h3, h4, h5, h6, label, .setting-label, .sidebar-link {
+          color: var(--text-main) !important;
+        }
+        .sidebar-link.active, .sidebar-link:hover {
+          color: #86efac !important;
+        }
+        .sidebar, .sidebar-link {
+          color: var(--text-main) !important;
+        }
+        input, select, textarea {
+          background: #fff;
+          color: #14532d;
+        }
+        body.dark input, body.dark select, body.dark textarea {
+          background: #1a5c1a;
+          color: #d1fae5;
+          border-color: #166534;
+        }
+        /* New route steps styles */
+        .route-step {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(34, 197, 94, 0.08);
+            border-radius: 0.75rem;
+            transition: all 0.15s;
+        }
+        .route-step:hover {
+            background: rgba(34, 197, 94, 0.15);
+            transform: translateX(4px);
+        }
+        .route-step-number {
+            width: 28px;
+            height: 28px;
+            background: #16a34a;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .route-step-content {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 via-emerald-100 to-teal-100 min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="sidebar flex flex-col py-7 px-3 space-y-6 animate-slidein">
+        <div class="text-3xl font-extrabold text-emerald-200 tracking-wide mb-4">EcoRoute</div>
+        <nav class="flex-1 flex flex-col gap-2">
+    <a href="index.html" class="sidebar-link"><i data-feather="map" class="icon"></i> Map & Routing</a>
+    <a href="statistics.html" class="sidebar-link"><i data-feather="bar-chart-2" class="icon"></i> Statistics</a>
+    <a href="fuel.html" class="sidebar-link"><i data-feather="droplet" class="icon"></i> Fuel Calculator</a>
+    <a href="settings.html" class="sidebar-link"><i data-feather="settings" class="icon"></i> Settings</a>
+</nav>
+        <div class="mt-auto flex flex-col gap-2 text-xs text-green-200">
+            <span>Smart Waste Routing</span>
+            <span>© 2025 MST Optimization</span>
+        </div>
+    </aside>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <header class="bg-gradient-to-r from-green-900 to-emerald-800 text-white py-7 px-6 shadow-xl animate-fadein">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-center tracking-tight mb-2">Smart Waste Collection Routing</h1>
+            <p class="text-center text-lg sm:text-xl font-medium italic text-emerald-200">MST-based Optimization · Efficient, Elegant & Smart</p>
+        </header>
+        <main class="flex-1 container mx-auto px-3 sm:px-8 py-8 flex flex-col lg:flex-row gap-8 animate-fadein">
+            <!-- Map & Controls Panel -->
+            <section class="flex-1 glass p-8 flex flex-col gap-7 shadow-xl">
+                <h2 class="text-2xl font-bold mb-2 text-green-700 italic">Collection Map</h2>
+                <div id="map" class="rounded-2xl border-2 border-green-200 shadow-md transition-all min-h-[350px] min-w-[280px] mb-2"
+                     style="width:100%; height:430px;"></div>
+                <div class="flex flex-wrap gap-4 justify-center mt-2">
+    <button id="add-point-btn" class="btn-main">Add Collection Point</button>
+    <button id="delete-point-btn" class="btn-secondary">Delete Selected Point</button>
+    <button id="optimize-btn" class="btn-main">Optimize Route (MST)</button>
+    <button id="reset-btn" class="btn-secondary">Reset</button>
+</div>
+                <div class="text-center mt-3 text-green-700 transition-all animate-pulse">
+                    <span class="italic">Tip: Use the map to add your collection points, then optimize for the most efficient route!</span>
+                </div>
+                
+                <!-- New Route Steps Section -->
+                
+            </section>
+            <!-- Side Info & Calculators -->
+            <aside class="w-full lg:w-1/3 flex flex-col gap-8  overflow-y-auto">
+                <!-- Stats Card -->
+                <div class="glass p-7 shadow-lg transition-all">
+                    <h2 class="text-2xl text-green-800 font-semibold mb-4 italic">Route Statistics</h2>
+                    <ul class="space-y-2">
+                        <li id="stat-points" class="font-mono">Collection Points: 0</li>
+                        <li id="stat-distance" class="font-mono">Total Route Length: 0</li>
+                    </ul>
+                    <h3 class="text-lg font-semibold mt-5 text-green-900 italic">How It Works</h3>
+                    <ul class="list-decimal pl-6 mt-2 space-y-1 text-green-600">
+                        <li class="italic">Click <b>Add Collection Point</b> and tap the map to place collection spots.</li>
+                        <li class="italic">Click <b>Optimize Route</b> for an MST-based optimal path.</li>
+                        <li class="italic">Review, experiment, and adjust as needed for best efficiency!</li>
+                    </ul>
+                </div>
+                <div class="glass p-7 shadow-lg transition-all">
+                    <section class="glass p-7 shadow-lg transition-all mb-4" id="routeStepsContainer" style="display: none;">
+                    <h2 class="text-2xl font-bold text-green-800 mb-3 flex items-center gap-2">
+                        <i data-feather="list" class="icon"></i> Optimized Route Steps
+                    </h2>
+                    <div id="routeSteps" class="space-y-2">
+                        <!-- Route steps will be inserted here by JavaScript -->
+                    </div>
+                </section>
+                </div>
+            </aside>
+        </main>
+        <footer class="bg-gradient-to-r from-green-900 to-emerald-800 text-white py-4 text-center shadow-xl animate-fadein">
+            <span class="font-semibold tracking-wider text-lg" style="font-style:italic;">Smart Waste Collection</span>
+            <span class="mx-2">·</span>
+            <span class="text-sm italic">MST Optimization Demo · <span class="text-emerald-200">2025</span></span>
+        </footer>
+    </div>
+    <!-- Scripts -->
+    <script>
+        feather.replace();
+        function applyRoutingOptions() {
+    // Get values, or set defaults
+    const vehicleType = localStorage.getItem('sgb_vehicle_type') || 'diesel'; // Default to diesel
+    const units = localStorage.getItem('sgb_units') || 'km';
+
+    // Set UI dropdowns if they exist (for editability)
+    if (document.getElementById('vehicleType')) {
+        document.getElementById('vehicleType').value = vehicleType;
+    }
+    if (document.getElementById('units')) {
+        document.getElementById('units').value = units;
+    }
+
+    // Use these in your calculations (for example in fuel calculation, distance display, etc.)
+    window.sgbVehicleType = vehicleType;
+    window.sgbUnits = units;
+}
+
+// Call this on DOMContentLoaded or at the top of your script
+document.addEventListener('DOMContentLoaded', applyRoutingOptions);
+        // Sync route length to fuel calculator (for future, if needed)
+        function syncRouteLength() {
+            const statDistance = document.getElementById('stat-distance');
+            const routeLengthElem = document.getElementById('routeLength');
+            if (statDistance && routeLengthElem) {
+                const match = statDistance.textContent.match(/([0-9.]+)\s*km/);
+                if (match) routeLengthElem.value = match[1];
+                else routeLengthElem.value = "";
+            }
+        }
+        document.addEventListener('DOMContentLoaded', syncRouteLength);
+
+        // Patch updateStats to call syncRouteLength after stats update
+        let oldUpdateStats = window.updateStats;
+        window.updateStats = function() {
+            if (oldUpdateStats) oldUpdateStats();
+            syncRouteLength();
+        };
+        // Theme switching logic for all pages (no themeSelect on non-settings pages)
+function applyTheme(theme) {
+    if (theme === "dark") {
+        document.body.classList.add("dark");
+    } else if (theme === "light") {
+        document.body.classList.remove("dark");
+    } else {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            document.body.classList.add("dark");
+        } else {
+            document.body.classList.remove("dark");
+        }
+    }
+}
+window.addEventListener('DOMContentLoaded', function() {
+    const theme = localStorage.getItem('sgb_theme') || 'auto';
+    applyTheme(theme);
+});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+    if ((localStorage.getItem('sgb_theme') || 'auto') === 'auto') {
+        applyTheme('auto');
+    }
+});
+        
+    </script>
+    <script src="script.js"></script>
+    <script src="api.js"></script>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxqFxe6Ml6PmwbGmB0RoFOMi4h6JkKefk&callback=initMap"></script>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+if (!sessionStorage.getItem('welcome_shown')) {
+    window.location.href = "welcome.html";
+}
+</script>
+    <meta charset="UTF-8">
+    <title>Settings · SGB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        body, h1, h2, h3, h4, h5, h6 {font-family: 'Inter', 'Segoe UI', Arial, sans-serif !important;}
+        .glass {background: rgba(255,255,255,0.86); box-shadow: 0 10px 36px 0 rgba(31,38,135,0.14); border-radius: 1.25rem; border: 1.5px solid rgba(34, 197, 94, 0.10); backdrop-filter: blur(8px);}
+        .sidebar {background: linear-gradient(135deg,#1a5c1a 60%,#2e8b57 100%); color: #f9fafb; min-width: 250px; max-width: 260px;}
+        .sidebar .icon {stroke: #d1fae5;}
+        .sidebar-link {display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1.3rem; margin: 0.15rem 0; border-radius: 0.75rem; cursor: pointer; transition: background 0.15s, color 0.18s;}
+        .sidebar-link:hover, .sidebar-link.active {background: rgba(34, 197, 94, 0.18); color: #86efac;}
+        .setting-label {font-weight: 500; color: #14532d;}
+        .btn-main {
+            background: linear-gradient(90deg,#16a34a 30%,#22c55e 100%);
+            color: #fff;
+            font-weight: 700;
+            border-radius: 1.5rem;
+            padding: 0.8em 2.2em;
+            transition: all 0.2s;
+            box-shadow: 0 4px 32px rgba(22, 163, 74, 0.09);
+        }
+        .btn-main:hover {
+            background: linear-gradient(90deg,#22c55e 10%,#16a34a 90%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.14);
+        }
+        .btn-secondary {
+            background: #fff;
+            color: #166534;
+            border: 2px solid #166534;
+            font-weight: 600;
+            border-radius: 1.5rem;
+            padding: 0.8em 2.2em;
+            transition: all 0.13s;
+        }
+        .btn-secondary:hover {
+            background: #dcfce7;
+            color: #14532d;
+            border-color: #14532d;
+        }
+        :root {
+          --main-bg: #f0fdf4;
+          --sidebar-bg: linear-gradient(135deg,#1a5c1a 60%,#2e8b57 100%);
+          --glass-bg: rgba(255,255,255,0.86);
+          --text-main: #14532d;
+          --header-bg: linear-gradient(to right, #1a5c1a, #2e8b57);
+        }
+
+        body.dark {
+          --main-bg: #0c1a12;
+          --sidebar-bg: linear-gradient(135deg,#0d2818 80%,#1b3a2b 100%);
+          --glass-bg: rgba(26,92,26,0.92);
+          --text-main: #d1fae5;
+          --header-bg: linear-gradient(to right, #0d2818, #1b3a2b);
+          color-scheme: dark;
+        }
+
+        body {
+          background: var(--main-bg);
+        }
+        .sidebar {
+          background: var(--sidebar-bg);
+        }
+        header, footer {
+          background: var(--header-bg);
+        }
+
+        .glass {
+          background: var(--glass-bg) !important;
+          color: var(--text-main);
+        }
+        h1, h2, h3, h4, h5, h6, label, .setting-label, .sidebar-link {
+          color: var(--text-main) !important;
+        }
+        .sidebar-link.active, .sidebar-link:hover {
+          color: #86efac !important;
+        }
+        .sidebar, .sidebar-link {
+          color: var(--text-main) !important;
+        }
+        input, select, textarea {
+          background: #fff;
+          color: #14532d;
+          border-color: #86efac;
+        }
+        body.dark input, body.dark select, body.dark textarea {
+          background: #1a5c1a;
+          color: #d1fae5;
+          border-color: #166534;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 via-emerald-100 to-teal-100 min-h-screen flex">
+    <aside class="sidebar flex flex-col py-7 px-3 space-y-6">
+        <div class="text-3xl font-extrabold text-emerald-200 tracking-wide mb-4">EcoRoute</div>
+        <nav class="flex-1 flex flex-col gap-2">
+            <a href="index.html" class="sidebar-link"><i data-feather="map" class="icon"></i> Map & Routing</a>
+            <a href="statistics.html" class="sidebar-link"><i data-feather="bar-chart-2" class="icon"></i> Statistics</a>
+            <a href="fuel.html" class="sidebar-link"><i data-feather="droplet" class="icon"></i> Fuel Calculator</a>
+            <a href="settings.html" class="sidebar-link active"><i data-feather="settings" class="icon"></i> Settings</a>
+        </nav>
+        <div class="mt-auto flex flex-col gap-2 text-xs text-green-200">
+            <span>Smart Waste Routing</span>
+            <span>© 2025 MST Optimization</span>
+        </div>
+    </aside>
+    <div class="flex-1 flex flex-col">
+        <header class="bg-gradient-to-r from-green-900 to-emerald-800 text-white py-7 px-6 shadow-xl">
+            <h1 class="text-4xl font-extrabold text-center tracking-tight mb-2">Settings</h1>
+            <p class="text-center text-lg font-medium italic text-emerald-200">Customize your Smart Waste Routing experience</p>
+        </header>
+        <main class="flex-1 container mx-auto px-3 sm:px-8 py-8 flex flex-col gap-8">
+            <!-- Theme Section -->
+            <section class="glass p-7 shadow-lg mb-2">
+                <h2 class="text-2xl text-green-900 font-semibold mb-3">Theme</h2>
+                <div class="flex items-center gap-4 mb-2">
+                    <span class="setting-label">Mode:</span>
+                    <select id="themeSelect" class="rounded border-green-200 px-2 py-1">
+                        <option value="auto">Auto</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Map Preferences -->
+            <section class="glass p-7 shadow-lg mb-2">
+                <h2 class="text-2xl text-green-900 font-semibold mb-3">Map Preferences</h2>
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-4">
+                        <span class="setting-label">Default Map Type:</span>
+                        <select id="mapTypeSelect" class="rounded border-green-200 px-2 py-1">
+                            <option value="roadmap">Roadmap</option>
+                            <option value="satellite">Satellite</option>
+                            <option value="terrain">Terrain</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="setting-label">Default Zoom Level:</span>
+                        <input id="zoomInput" type="number" min="1" max="20" class="rounded border-green-200 px-2 py-1 w-20" value="12">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Routing Options -->
+            <section class="glass p-7 shadow-lg mb-2">
+                <h2 class="text-2xl text-green-900 font-semibold mb-3">Routing Options</h2>
+                <div class="flex items-center gap-4 mb-2">
+                    <span class="setting-label">Default Vehicle:</span>
+                    <select id="vehicleTypeSelect" class="rounded border-green-200 px-2 py-1">
+                        <option value="diesel">Diesel</option>
+                        <option value="petrol">Petrol</option>
+                        <option value="electric">Electric</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="setting-label">Units:</span>
+                    <select id="unitsSelect" class="rounded border-green-200 px-2 py-1">
+                        <option value="km">Kilometers (km)</option>
+                        <option value="miles">Miles (mi)</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Data & Privacy -->
+            <section class="glass p-7 shadow-lg mb-2">
+                <h2 class="text-2xl text-green-900 font-semibold mb-3">Data & Privacy</h2>
+                <div class="flex flex-col gap-4">
+                    <button onclick="clearRouteHistory()" class="btn-main w-full flex items-center justify-center gap-2">
+                        <i data-feather="trash-2"></i>
+                        Clear Route History
+                    </button>
+                    <button onclick="clearAllData()" class="btn-secondary w-full flex items-center justify-center gap-2">
+                        <i data-feather="x-circle"></i>
+                        Clear All Saved Data
+                    </button>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section class="glass p-7 shadow-lg mb-2">
+                <h2 class="text-2xl text-green-900 font-semibold mb-3">About</h2>
+                <div class="mb-2"><span class="setting-label">App Version:</span> 1.0.0</div>
+                <div class="mb-2"><span class="setting-label">Contact:</span> <a href="mailto:support@sgb.com" class="text-green-700 underline">support@sgb.com</a></div>
+                <div>
+                    <span class="setting-label">Feedback:</span>
+                    <button onclick="document.getElementById('feedbackForm').scrollIntoView({behavior:'smooth'});" class="btn-main flex items-center gap-2 text-sm px-4 py-2 mt-1">
+                        <i data-feather="message-circle" class="icon"></i>
+                        Feedback
+                    </button>
+                </div>
+            </section>
+
+            <!-- Feedback Form Section -->
+            <section class="glass p-7 shadow-lg mb-2">
+                <h2 class="text-2xl text-green-900 font-semibold mb-3">Send Feedback</h2>
+                <form id="feedbackForm" class="flex flex-col gap-4">
+                    <div>
+                        <label for="feedbackName" class="block font-medium mb-1 text-green-700">Your Name (optional)</label>
+                        <input type="text" id="feedbackName" class="rounded border-green-200 px-3 py-2 w-full" placeholder="Enter your name">
+                    </div>
+                    <div>
+                        <label for="feedbackEmail" class="block font-medium mb-1 text-green-700">Your Email (optional)</label>
+                        <input type="email" id="feedbackEmail" class="rounded border-green-200 px-3 py-2 w-full" placeholder="Enter your email">
+                    </div>
+                    <div>
+                        <label for="feedbackMsg" class="block font-medium mb-1 text-green-700">Feedback <span class="text-red-500">*</span></label>
+                        <textarea id="feedbackMsg" class="rounded border-green-200 px-3 py-2 w-full min-h-[80px]" required placeholder="Your feedback..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-main w-full flex items-center justify-center gap-2">
+                        <i data-feather="send"></i>
+                        Submit Feedback
+                    </button>
+                    <div id="feedbackStatus" class="mt-2 text-center text-green-700"></div>
+                </form>
+            </section>
+        </main>
+        <footer class="bg-gradient-to-r from-green-900 to-emerald-800 text-white py-4 text-center shadow-xl">
+            <span class="font-semibold tracking-wider text-lg" style="font-style:italic;">Smart Waste Collection</span>
+            <span class="mx-2">·</span>
+            <span class="text-sm italic">MST Optimization Demo · <span class="text-emerald-200">2025</span></span>
+        </footer>
+    </div>
+    <script>
+        feather.replace();
+
+        // Theme switching logic
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.body.classList.add("dark");
+            } else if (theme === "light") {
+                document.body.classList.remove("dark");
+            } else {
+                if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                    document.body.classList.add("dark");
+                } else {
+                    document.body.classList.remove("dark");
+                }
+            }
+        }
+
+        function saveTheme(theme) {
+            localStorage.setItem('sgb_theme', theme);
+            applyTheme(theme);
+        }
+
+        // On load, apply stored or system theme
+        window.addEventListener('DOMContentLoaded', function() {
+            const theme = localStorage.getItem('sgb_theme') || 'auto';
+            document.getElementById('themeSelect').value = theme;
+            applyTheme(theme);
+        });
+
+        // On theme select change
+        document.getElementById('themeSelect').addEventListener('change', function() {
+            saveTheme(this.value);
+        });
+
+        // If user changes OS theme and theme is "auto"
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+            if ((localStorage.getItem('sgb_theme') || 'auto') === 'auto') {
+                applyTheme('auto');
+            }
+        });
+
+        // Save settings to localStorage
+        const themeSelect = document.getElementById('themeSelect');
+        const mapTypeSelect = document.getElementById('mapTypeSelect');
+        const zoomInput = document.getElementById('zoomInput');
+        const vehicleTypeSelect = document.getElementById('vehicleTypeSelect');
+        const unitsSelect = document.getElementById('unitsSelect');
+
+        // Load settings
+        window.addEventListener('DOMContentLoaded', function() {
+            themeSelect.value = localStorage.getItem('sgb_theme') || 'auto';
+            mapTypeSelect.value = localStorage.getItem('sgb_mapType') || 'roadmap';
+            zoomInput.value = localStorage.getItem('sgb_zoom') || 12;
+            vehicleTypeSelect.value = localStorage.getItem('sgb_vehicleType') || 'diesel';
+            unitsSelect.value = localStorage.getItem('sgb_units') || 'km';
+            feather.replace();
+        });
+
+        themeSelect.addEventListener('change', () => localStorage.setItem('sgb_theme', themeSelect.value));
+        mapTypeSelect.addEventListener('change', () => localStorage.setItem('sgb_mapType', mapTypeSelect.value));
+        zoomInput.addEventListener('change', () => localStorage.setItem('sgb_zoom', zoomInput.value));
+        vehicleTypeSelect.addEventListener('change', () => localStorage.setItem('sgb_vehicleType', vehicleTypeSelect.value));
+        unitsSelect.addEventListener('change', () => localStorage.setItem('sgb_units', unitsSelect.value));
+
+        function clearRouteHistory() {
+            localStorage.removeItem('sgb_route_history');
+            alert('Route history cleared!');
+        }
+        
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                alert('All saved data cleared!');
+                window.location.reload();
+            }
+        }
+
+        // Feedback form logic
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('feedbackName').value.trim();
+            const email = document.getElementById('feedbackEmail').value.trim();
+            const msg = document.getElementById('feedbackMsg').value.trim();
+            const statusDiv = document.getElementById('feedbackStatus');
+            
+            if (!msg) {
+                statusDiv.textContent = "Feedback message is required.";
+                statusDiv.className = "mt-2 text-center text-red-600";
+                return;
+            }
+
+            statusDiv.textContent = "Thank you for your feedback!";
+            statusDiv.className = "mt-2 text-center text-green-700";
+            document.getElementById('feedbackForm').reset();
+        });
+
+        function saveRoutingOptions() {
+            const vehicleType = document.getElementById('vehicleTypeSelect').value;
+            const units = document.getElementById('unitsSelect').value;
+            localStorage.setItem('sgb_vehicle_type', vehicleType);
+            localStorage.setItem('sgb_units', units);
+        }
+
+        document.getElementById('vehicleTypeSelect').addEventListener('change', saveRoutingOptions);
+        document.getElementById('unitsSelect').addEventListener('change', saveRoutingOptions);
+    </script>
+</body>
+</html>
